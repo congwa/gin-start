@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// 定义全局变量
 var (
 	DB     *gorm.DB
 	LOG    *zap.Logger
