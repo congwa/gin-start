@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/congwa/gin-start/initialize"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
@@ -70,7 +71,7 @@ func initDB() *gorm.DB {
 		SkipInitializeWithVersion: false,   // 根据版本自动配置
 	}
 
-	if db, err := gorm.Open(mysql.New(mysqlConfig)); err != nil {
+	if db, err := gorm.Open(mysql.New(mysqlConfig), initialize.Gorm.Config(m.Prefix, m.Singular)); err != nil {
 		return nil
 	} else {
 		db.InstanceSet("gorm:table_options", "ENGINE="+m.Engine)
