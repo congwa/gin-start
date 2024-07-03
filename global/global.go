@@ -1,13 +1,15 @@
 package global
 
 import (
-	"go.uber.org/zap"
+	"github.com/congwa/gin-start/config"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 var (
-	DB *gorm.DB
-	LOG *zap.Logger
-	VP *viper.Viper
+	DB     *gorm.DB
+	LOG    *zap.Logger
+	VP     *viper.Viper
+	Config *config.Config
 )

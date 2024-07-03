@@ -1,17 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"go.uber.org/zap"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 
 	// 全局模块
-	"github.com/congwa/gin-start/global" 
 	"github.com/congwa/gin-start/config"
 	"github.com/congwa/gin-start/core"
+	"github.com/congwa/gin-start/global"
 )
 
 var db = make(map[string]string)
@@ -78,12 +77,8 @@ func main() {
 	// 从core中初始化 日志 模块
 	global.LOG = core.Zap()
 
-
-
 	// 获取配置 配置这里使用 viper
 	conf := config.GetConfig()
-
-
 
 	r := setupRouter()
 	// Listen and Server in 0.0.0.0:8080
