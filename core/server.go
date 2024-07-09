@@ -16,6 +16,7 @@ import (
 
 func RunServer() {
 	initialize.Redis()
+	initialize.Timer()
 	Router := initialize.Routers()
 	s := endless.NewServer(global.Config.Server.Host+":"+global.Config.Server.Port, Router)
 	s.ReadHeaderTimeout = 20 * time.Second
