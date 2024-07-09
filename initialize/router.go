@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"github.com/congwa/gin-start/middleware"
 	"github.com/congwa/gin-start/router"
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +15,11 @@ func Routers() *gin.Engine {
 	PublicGroup := Router.Group("v1")
 	{
 		systemRouter.InitBaseRouter(PublicGroup)
+	}
+	PrivateGroup := Router.Group("v1")
+	PrivateGroup.Use(middleware.JWTAuth())
+	{
+		systemRouter.InitUserRouter(PrivateGroup)
 	}
 	return Router
 }

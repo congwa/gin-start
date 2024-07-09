@@ -79,3 +79,20 @@ func (b *BaseApi) Register(c *gin.Context) {
 	}
 	response.OkWithDetailed(systemRes.SysUserResponse{User: userReturn}, "注册成功", c)
 }
+
+// ResetPassword 修改用户密码
+func (b *BaseApi) ResetPassword(c *gin.Context) {
+	var user system.SysUser
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = userService.ResetPassword(user.ID)
+	if err != nil {
+		global.LOG.Error("修改失败!", zap.Error(err))
+		response.FailWithMessage("修改失败", c)
+		return
+	}
+	response.OkWithMessage("修改成功", c)
+}

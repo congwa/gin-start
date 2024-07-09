@@ -41,3 +41,9 @@ func (userService *UserService) Register(u system.SysUser) (userInter system.Sys
 
 	return u, err
 }
+
+// resetPassword 修改用户密码
+func (userService *UserService) ResetPassword(ID uint) (err error) {
+	err = global.DB.Model(&system.SysUser{}).Where("id = ?", ID).Update("password", utils.BcryptHash("123456")).Error
+	return err
+}
