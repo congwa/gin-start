@@ -6,6 +6,7 @@ import (
 	"github.com/congwa/gin-start/model/system"
 	systemReq "github.com/congwa/gin-start/model/system/request"
 	systemRes "github.com/congwa/gin-start/model/system/response"
+	"github.com/congwa/gin-start/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -32,10 +33,33 @@ func (b *BaseApi) Login(c *gin.Context) {
 			global.LOG.Error("登陆失败! 用户名不存在或者密码错误!", zap.Error(err))
 			return
 		}
-		// TODO: 进行登录的下一步 中间件处理
+		// 签发jwt
+		b.TokenNext(c, *user)
 		return
 	}
 	response.FailWithMessage("验证码错误", c)
+}
+
+// TokenNext 登录以后签发jwt
+func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser) {
+	j := &utils.JWT{SigningKey: []byte(global.Config.JWT.SigningKey)} // 唯一签名
+	claims := j.CreateClaims(systemReq.BaseClaims{
+		UUID:     user.UUID,
+		ID:       user.ID,
+		NickName: user.NickName,
+		Username: user.Username,
+	})
+	token, err := j.CreateToken(claims)
+	if err != nil {
+		global.LOG.Error("获取token失败!", zap.Error(err))
+		response.FailWithMessage("获取token失败", c)
+		return
+	}
+	response.OkWithDetailed(systemRes.LoginResponse{
+		User:      user,
+		Token:     token,
+		ExpiresAt: claims.RegisteredClaims.ExpiresAt.Unix() * 1000,
+	}, "登录成功", c)
 }
 
 func (b *BaseApi) Register(c *gin.Context) {
