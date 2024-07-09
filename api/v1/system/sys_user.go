@@ -8,6 +8,8 @@ import (
 	systemRes "github.com/congwa/gin-start/model/system/response"
 	"github.com/congwa/gin-start/utils"
 
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -19,18 +21,30 @@ func (b *BaseApi) Login(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&l)
 
-	// key := c.ClientIP()
+	key := c.ClientIP()
 
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 	}
 
-	if l.CaptchaId != "" && l.Captcha != "" {
+	// 判断验证码是否开启
+	openCaptcha := global.Config.Captcha.OpenCaptcha // 是否开启防爆次数
+
+	v := store.Get(store.PreKey+key, false)
+
+	if v == "" {
+		store.Set(key, "1")
+	}
+
+	var oc = openCaptcha == 0 || openCaptcha < interfaceToInt(v)
+
+	if !oc || (l.CaptchaId != "" && l.Captcha != "" && store.Verify(l.CaptchaId, l.Captcha, true)) {
 		u := &system.SysUser{Username: l.Username, Password: l.Password}
 		user, err := userService.Login(u)
 		if err != nil {
 			response.FailWithMessage("用户名不存在或者密码错误", c)
 			global.LOG.Error("登陆失败! 用户名不存在或者密码错误!", zap.Error(err))
+			store.Set(key, strconv.Itoa(interfaceToInt(v)+1))
 			return
 		}
 		// 签发jwt

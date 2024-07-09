@@ -15,6 +15,7 @@ import (
 // 简单易用：使用方式与标准的 HTTP 服务器类似，只需少量修改代码。
 
 func RunServer() {
+	initialize.Redis()
 	Router := initialize.Routers()
 	s := endless.NewServer(global.Config.Server.Host+":"+global.Config.Server.Port, Router)
 	s.ReadHeaderTimeout = 20 * time.Second
